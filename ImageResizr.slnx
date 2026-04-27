@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ImageResizr.App/ImageResizr.App.csproj" />
+    <Project Path="src/ImageResizr.Core/ImageResizr.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ImageResizr.Tests/ImageResizr.Tests.csproj" />
+  </Folder>
+</Solution>
