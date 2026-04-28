@@ -149,22 +149,11 @@ public sealed class ImageResizrService : IImageResizrService
                     $"Resized '{Path.GetFileName(sourceFile)}' to {resizePlan.Width.ToString(CultureInfo.CurrentCulture)} x {resizePlan.Height.ToString(CultureInfo.CurrentCulture)} pixels.",
                     ResizeProgressLevel.Success));
             }
-            catch (InvalidDataException exception)
-            {
-                failedFiles++;
-                ReportFailure(progress, processedCount, sourceFiles.Count, sourceFile, exception.Message);
-            }
-            catch (NotSupportedException exception)
-            {
-                failedFiles++;
-                ReportFailure(progress, processedCount, sourceFiles.Count, sourceFile, exception.Message);
-            }
-            catch (IOException exception)
-            {
-                failedFiles++;
-                ReportFailure(progress, processedCount, sourceFiles.Count, sourceFile, exception.Message);
-            }
-            catch (UnauthorizedAccessException exception)
+            catch (Exception exception) when (
+                exception is InvalidDataException
+                or NotSupportedException
+                or IOException
+                or UnauthorizedAccessException)
             {
                 failedFiles++;
                 ReportFailure(progress, processedCount, sourceFiles.Count, sourceFile, exception.Message);
