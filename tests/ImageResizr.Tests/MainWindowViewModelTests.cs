@@ -94,8 +94,7 @@ public sealed class MainWindowViewModelTests
         const string expectedSummary = "3 images processed. 1.00 MB saved.";
         Assert.Equal(expectedSummary, viewModel.LatestActivityMessage);
 
-        service.ReportLateProgress();
-        await Task.Delay(100, TestContext.Current.CancellationToken);
+        await service.ReportLateProgressAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedSummary, viewModel.LatestActivityMessage);
     }
@@ -175,6 +174,7 @@ public sealed class MainWindowViewModelTests
     /// </summary>
     private sealed class LateProgressImageResizrService : IImageResizrService
     {
+        private readonly TaskCompletionSource lateProgressHandled = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private IProgress<ResizeProgressUpdate>? capturedProgress;
 
         /// <summary>
@@ -186,7 +186,15 @@ public sealed class MainWindowViewModelTests
             IProgress<ResizeProgressUpdate>? progress = null,
             CancellationToken cancellationToken = default)
         {
-            capturedProgress = progress;
+            capturedProgress = progress
+                ?? throw new InvalidOperationException("The test requires a progress reporter.");
+
+            if (capturedProgress is not Progress<ResizeProgressUpdate> concreteProgress)
+            {
+                throw new InvalidOperationException("The test requires Progress<ResizeProgressUpdate> to observe late progress delivery.");
+            }
+
+            concreteProgress.ProgressChanged += HandleProgressChanged;
 
             ResizeImagesResult result = new(
                 TotalFiles: 3,
@@ -201,15 +209,30 @@ public sealed class MainWindowViewModelTests
         }
 
         /// <summary>
-        /// Reports progress after the resize operation has already completed.
+        /// Reports progress after the resize operation has already completed and waits for delivery.
         /// </summary>
-        public void ReportLateProgress()
+        public async Task ReportLateProgressAsync(CancellationToken cancellationToken)
         {
             capturedProgress?.Report(new ResizeProgressUpdate(
                 ProcessedCount: 3,
                 TotalCount: 3,
                 Message: "Resized 'P1012828.JPG' to 1364 x 768 pixels.",
                 Level: ResizeProgressLevel.Success));
+
+            await lateProgressHandled.Task.WaitAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Signals when the late progress callback has been dispatched.
+        /// </summary>
+        private void HandleProgressChanged(object? sender, ResizeProgressUpdate update)
+        {
+            if (sender is Progress<ResizeProgressUpdate> concreteProgress)
+            {
+                concreteProgress.ProgressChanged -= HandleProgressChanged;
+            }
+
+            lateProgressHandled.TrySetResult();
         }
     }
 }
