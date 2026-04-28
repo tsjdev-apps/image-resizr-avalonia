@@ -316,7 +316,9 @@ public sealed class ImageResizrServiceTests
     {
         await Task.Yield();
 
-        using SKCodec codec = SKCodec.Create(path);
+        using SKCodec codec = SKCodec.Create(path, out SKCodecResult codecResult)!;
+        Assert.Equal(SKCodecResult.Success, codecResult);
+
         SKImageInfo imageInfo = codec.Info;
 
         Assert.Equal(expectedWidth, imageInfo.Width);
