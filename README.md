@@ -68,7 +68,7 @@ Image Resizr currently works with the following file types:
 - `.bmp`
 - `.webp`
 
-The service keeps the original file extension and writes resized output with the same format family.
+The service keeps the original file extension and writes resized output with the same format family. Animated `.gif` and `.webp` files are processed as still images, so only the first frame is used in the resized output.
 
 ## Getting Started
 
