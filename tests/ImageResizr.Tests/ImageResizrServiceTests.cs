@@ -194,7 +194,8 @@ public sealed class ImageResizrServiceTests
     {
         using TestWorkspace workspace = new();
         workspace.CreateInputFile("broken.jpg", "this is not a real image");
-        await workspace.CreateInputImageAsync("camera.png", 120, 80);
+        string validInputPath = await workspace.CreateInputImageAsync("camera.png", 120, 80);
+        string outputPath = Path.Combine(workspace.OutputFolder, "camera.png");
         ListProgress progress = new();
         ImageResizrService service = new();
 
@@ -214,7 +215,12 @@ public sealed class ImageResizrServiceTests
         Assert.Equal(2, result.TotalFiles);
         Assert.Equal(1, result.ResizedFiles);
         Assert.Equal(1, result.FailedFiles);
-        await AssertImageDimensionsAsync(Path.Combine(workspace.OutputFolder, "camera.png"), 60, 40);
+        await AssertImageDimensionsAsync(outputPath, 60, 40);
+        long expectedInputBytes = new FileInfo(validInputPath).Length;
+        long expectedOutputBytes = new FileInfo(outputPath).Length;
+        Assert.Equal(expectedInputBytes, result.InputBytes);
+        Assert.Equal(expectedOutputBytes, result.OutputBytes);
+        Assert.Equal(Math.Max(0, expectedInputBytes - expectedOutputBytes), result.SavedBytes);
         Assert.Contains(
             progress.Updates,
             update => update.Level == ResizeProgressLevel.Error

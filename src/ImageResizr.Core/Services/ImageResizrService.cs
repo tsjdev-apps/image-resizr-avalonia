@@ -106,7 +106,7 @@ public sealed class ImageResizrService : IImageResizrService
             try
             {
                 FileInfo inputInfo = new(sourceFile);
-                inputBytes += inputInfo.Length;
+                long sourceBytes = inputInfo.Length;
 
                 using SKBitmap decodedBitmap = LoadBitmap(sourceFile, out SKEncodedOrigin encodedOrigin);
 
@@ -123,6 +123,7 @@ public sealed class ImageResizrService : IImageResizrService
 
                     if (copied || File.Exists(destinationFile))
                     {
+                        inputBytes += sourceBytes;
                         outputBytes += new FileInfo(destinationFile).Length;
                         outputFiles.Add(destinationFile);
                     }
@@ -140,6 +141,7 @@ public sealed class ImageResizrService : IImageResizrService
                 await SaveImageAsync(resizedBitmap, destinationFile, validatedRequest.OverwriteExisting, cancellationToken);
 
                 resizedFiles++;
+                inputBytes += sourceBytes;
                 outputFiles.Add(destinationFile);
                 outputBytes += new FileInfo(destinationFile).Length;
 
