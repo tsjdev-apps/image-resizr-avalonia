@@ -580,9 +580,19 @@ public sealed class ImageResizrService : IImageResizrService
     /// </summary>
     private static string ValidateFolderPath(string folderPath, string argumentName)
     {
-        return string.IsNullOrWhiteSpace(folderPath)
-            ? throw new ArgumentException("Both the input and output folders are required.", argumentName)
-            : Path.GetFullPath(folderPath.Trim());
+        if (!string.IsNullOrWhiteSpace(folderPath))
+        {
+            return Path.GetFullPath(folderPath.Trim());
+        }
+
+        string message = argumentName switch
+        {
+            nameof(ResizeImagesRequest.InputFolder) => "The input folder is required.",
+            nameof(ResizeImagesRequest.OutputFolder) => "The output folder is required.",
+            _ => "Folder path is required."
+        };
+
+        throw new ArgumentException(message, argumentName);
     }
 
     /// <summary>

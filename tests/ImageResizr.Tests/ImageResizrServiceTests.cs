@@ -249,6 +249,58 @@ public sealed class ImageResizrServiceTests
     }
 
     /// <summary>
+    /// Verifies that an empty input folder path reports the correct argument-specific message.
+    /// </summary>
+    [Fact]
+    public async Task ResizeAsyncRejectsEmptyInputFolderPath()
+    {
+        using TestWorkspace workspace = new();
+        ImageResizrService service = new();
+
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+            () => service.ResizeAsync(
+                new ResizeImagesRequest(
+                    InputFolder: string.Empty,
+                    workspace.OutputFolder,
+                    TargetWidth: 60,
+                    TargetHeight: 60,
+                    ImageResizeMode.Fit,
+                    ShrinkOnly: true,
+                    IgnoreOrientation: true,
+                    OverwriteExisting: false),
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Equal(nameof(ResizeImagesRequest.InputFolder), exception.ParamName);
+        Assert.Contains("The input folder is required.", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies that an empty output folder path reports the correct argument-specific message.
+    /// </summary>
+    [Fact]
+    public async Task ResizeAsyncRejectsEmptyOutputFolderPath()
+    {
+        using TestWorkspace workspace = new();
+        ImageResizrService service = new();
+
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+            () => service.ResizeAsync(
+                new ResizeImagesRequest(
+                    workspace.InputFolder,
+                    OutputFolder: string.Empty,
+                    TargetWidth: 60,
+                    TargetHeight: 60,
+                    ImageResizeMode.Fit,
+                    ShrinkOnly: true,
+                    IgnoreOrientation: true,
+                    OverwriteExisting: false),
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Equal(nameof(ResizeImagesRequest.OutputFolder), exception.ParamName);
+        Assert.Contains("The output folder is required.", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Asserts that an image file has the expected dimensions.
     /// </summary>
     private static async Task AssertImageDimensionsAsync(
