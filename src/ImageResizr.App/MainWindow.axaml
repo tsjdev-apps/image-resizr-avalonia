@@ -30,7 +30,9 @@
             <StackPanel Spacing="18">
                 <StackPanel Spacing="4">
                     <TextBlock Classes="heading-large" Text="Batch setup" />
-                    <TextBlock Classes="body-text" Text="Choose folders, select a size, and decide how the batch should handle image details." />
+                    <TextBlock Classes="body-text"
+                               Text="Choose folders, select a size, and decide how the batch should handle image details."
+                               TextWrapping="Wrap" />
                 </StackPanel>
 
                 <StackPanel Spacing="8">
