@@ -9,6 +9,8 @@ namespace ImageResizr.Tests;
 /// </summary>
 public sealed class MainWindowViewModelTests
 {
+    private static readonly TimeSpan ConditionWaitTimeout = TimeSpan.FromSeconds(5);
+
     /// <summary>
     /// Verifies that a new resize run clears the previous completion summary immediately.
     /// </summary>
@@ -67,6 +69,7 @@ public sealed class MainWindowViewModelTests
             () => viewModel.ProgressValue == 1
                   && viewModel.ProgressMaximum == 3
                   && viewModel.LatestActivityMessage == progressMessage,
+            "Timed out waiting for the reported progress to update the view model state.",
             TestContext.Current.CancellationToken);
 
         Assert.True(viewModel.IsBusy);
@@ -104,11 +107,29 @@ public sealed class MainWindowViewModelTests
     /// </summary>
     private static async Task WaitForConditionAsync(
         Func<bool> condition,
+        string failureMessage,
         CancellationToken cancellationToken)
     {
+        if (condition())
+        {
+            return;
+        }
+
+        using CancellationTokenSource timeoutSource = new(ConditionWaitTimeout);
+        using CancellationTokenSource linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            timeoutSource.Token);
+
         while (!condition())
         {
-            await Task.Delay(10, cancellationToken);
+            try
+            {
+                await Task.Delay(10, linkedCancellation.Token);
+            }
+            catch (OperationCanceledException) when (timeoutSource.IsCancellationRequested)
+            {
+                throw new TimeoutException(failureMessage);
+            }
         }
     }
 
