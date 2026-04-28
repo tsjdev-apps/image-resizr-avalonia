@@ -412,11 +412,32 @@ public sealed class ImageResizrService : IImageResizrService
     /// </summary>
     private static SKBitmap LoadBitmap(string sourceFile, out SKEncodedOrigin orientation)
     {
-        using SKCodec codec = SKCodec.Create(sourceFile);
-        orientation = codec.EncodedOrigin;
+        using SKCodec? codec = SKCodec.Create(sourceFile, out SKCodecResult codecResult);
+
+        if (codecResult != SKCodecResult.Success)
+        {
+            throw CreateCodecException(sourceFile, codecResult);
+        }
+
+        orientation = codec!.EncodedOrigin;
 
         return SKBitmap.Decode(codec)
             ?? throw new InvalidDataException($"The file '{sourceFile}' could not be decoded.");
+    }
+
+    /// <summary>
+    /// Maps a codec creation failure to the recoverable exception type used by the batch loop.
+    /// </summary>
+    private static Exception CreateCodecException(string sourceFile, SKCodecResult codecResult)
+    {
+        return codecResult switch
+        {
+            SKCodecResult.Unimplemented => new NotSupportedException(
+                $"The file '{sourceFile}' uses an unsupported image format."),
+            SKCodecResult.CouldNotRewind => new IOException(
+                $"The file '{sourceFile}' could not be read for decoding."),
+            _ => new InvalidDataException($"The file '{sourceFile}' could not be decoded.")
+        };
     }
 
     /// <summary>

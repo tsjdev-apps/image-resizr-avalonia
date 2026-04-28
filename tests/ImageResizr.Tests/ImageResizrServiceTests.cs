@@ -187,6 +187,43 @@ public sealed class ImageResizrServiceTests
     }
 
     /// <summary>
+    /// Verifies that a corrupt supported file is counted as failed without aborting the batch.
+    /// </summary>
+    [Fact]
+    public async Task ResizeAsyncCountsCorruptSupportedFilesAsFailuresAndContinuesBatch()
+    {
+        using TestWorkspace workspace = new();
+        workspace.CreateInputFile("broken.jpg", "this is not a real image");
+        await workspace.CreateInputImageAsync("camera.png", 120, 80);
+        ListProgress progress = new();
+        ImageResizrService service = new();
+
+        ResizeImagesResult result = await service.ResizeAsync(
+            new ResizeImagesRequest(
+                workspace.InputFolder,
+                workspace.OutputFolder,
+                TargetWidth: 60,
+                TargetHeight: 60,
+                ImageResizeMode.Fit,
+                ShrinkOnly: true,
+                IgnoreOrientation: true,
+                OverwriteExisting: false),
+            progress,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, result.TotalFiles);
+        Assert.Equal(1, result.ResizedFiles);
+        Assert.Equal(1, result.FailedFiles);
+        await AssertImageDimensionsAsync(Path.Combine(workspace.OutputFolder, "camera.png"), 60, 40);
+        Assert.Contains(
+            progress.Updates,
+            update => update.Level == ResizeProgressLevel.Error
+                && update.Message.Contains("broken.jpg", StringComparison.Ordinal)
+                && (update.Message.Contains("could not be decoded", StringComparison.Ordinal)
+                    || update.Message.Contains("unsupported image format", StringComparison.Ordinal)));
+    }
+
+    /// <summary>
     /// Verifies that a missing input folder is rejected with a clear exception.
     /// </summary>
     [Fact]
