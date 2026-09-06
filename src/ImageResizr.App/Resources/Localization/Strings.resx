@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Window_Title" xml:space="preserve"><value>Image Resizr by tsjdev apps</value></data>
+  <data name="Main_Title" xml:space="preserve"><value>Image Resizr</value></data>
+  <data name="Main_Description" xml:space="preserve"><value>Resize images quickly while preserving their aspect ratio.</value></data>
+  <data name="SourceFolder_Label" xml:space="preserve"><value>Source folder</value></data>
+  <data name="SourceFolder_Watermark" xml:space="preserve"><value>Select the folder that contains the images to resize</value></data>
+  <data name="SourceFolder_PickerTitle" xml:space="preserve"><value>Choose the source folder</value></data>
+  <data name="TargetFolder_Label" xml:space="preserve"><value>Target folder</value></data>
+  <data name="TargetFolder_Watermark" xml:space="preserve"><value>Select where resized images should be saved</value></data>
+  <data name="TargetFolder_PickerTitle" xml:space="preserve"><value>Choose the target folder</value></data>
+  <data name="Browse_ToolTip" xml:space="preserve"><value>Browse…</value></data>
+  <data name="ResizeOptions_Title" xml:space="preserve"><value>Resize options</value></data>
+  <data name="SizePreset_Label" xml:space="preserve"><value>Size preset</value></data>
+  <data name="Width_Label" xml:space="preserve"><value>Width</value></data>
+  <data name="Height_Label" xml:space="preserve"><value>Height</value></data>
+  <data name="Unit_Label" xml:space="preserve"><value>Unit</value></data>
+  <data name="Pixels_Label" xml:space="preserve"><value>Pixels</value></data>
+  <data name="ResizeMode_Label" xml:space="preserve"><value>Resize mode</value></data>
+  <data name="ShrinkOnly_Label" xml:space="preserve"><value>Make pictures smaller but not larger</value></data>
+  <data name="IgnoreOrientation_Label" xml:space="preserve"><value>Ignore image orientation</value></data>
+  <data name="OverwriteFiles_Label" xml:space="preserve"><value>Overwrite existing files</value></data>
+  <data name="ResizeImages_Button" xml:space="preserve"><value>Resize images</value></data>
+  <data name="ResizingImages_Button" xml:space="preserve"><value>Resizing images…</value></data>
+  <data name="Progress_Title" xml:space="preserve"><value>Live progress</value></data>
+  <data name="Progress_OverallTitle" xml:space="preserve"><value>Overall resize progress</value></data>
+  <data name="Progress_HistoryTitle" xml:space="preserve"><value>Resize history</value></data>
+  <data name="Progress_NoFiles" xml:space="preserve"><value>No files have been processed yet.</value></data>
+  <data name="Progress_ProcessedFile" xml:space="preserve"><value>{0} / {1} file processed</value></data>
+  <data name="Progress_ProcessedFiles" xml:space="preserve"><value>{0} / {1} files processed</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Choose folders, pick a size, and start the batch.</value></data>
+  <data name="Status_Preparing" xml:space="preserve"><value>Preparing the resize operation.</value></data>
+  <data name="Status_Running" xml:space="preserve"><value>Images are being resized.</value></data>
+  <data name="Status_Completed" xml:space="preserve"><value>Resize operation completed.</value></data>
+  <data name="Status_NoSupportedFiles" xml:space="preserve"><value>The source folder did not contain any supported image files.</value></data>
+  <data name="Status_ReviewSettings" xml:space="preserve"><value>Please review the folders and resize settings, then try again.</value></data>
+  <data name="Status_InputFolderMissing" xml:space="preserve"><value>The source folder could not be found.</value></data>
+  <data name="Status_FileSystemError" xml:space="preserve"><value>A file-system error interrupted the resize operation.</value></data>
+  <data name="Status_AccessDenied" xml:space="preserve"><value>The app does not have permission to access one of the selected folders.</value></data>
+  <data name="Validation_InputFolderRequired" xml:space="preserve"><value>The source folder is required.</value></data>
+  <data name="Validation_OutputFolderRequired" xml:space="preserve"><value>The target folder is required.</value></data>
+  <data name="Validation_DimensionsPositive" xml:space="preserve"><value>Width and height must be greater than zero.</value></data>
+  <data name="History_Status_Resized" xml:space="preserve"><value>Resized</value></data>
+  <data name="History_Status_Overwritten" xml:space="preserve"><value>Overwritten</value></data>
+  <data name="History_Status_Skipped" xml:space="preserve"><value>Skipped</value></data>
+  <data name="History_Status_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="History_TargetExists" xml:space="preserve"><value>Output file already exists</value></data>
+  <data name="History_AlreadyCorrectSize" xml:space="preserve"><value>Image already matches the requested size</value></data>
+  <data name="History_ResizeFailed" xml:space="preserve"><value>Image could not be resized</value></data>
+  <data name="History_SummaryTitle" xml:space="preserve"><value>Summary</value></data>
+  <data name="History_Status_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="History_SummaryDetails" xml:space="preserve"><value>{0} resized · {1} overwritten · {2} skipped · {3} failed</value></data>
+  <data name="Completion_One" xml:space="preserve"><value>{0} image processed. {1} saved.</value></data>
+  <data name="Completion_Many" xml:space="preserve"><value>{0} images processed. {1} saved.</value></data>
+  <data name="Preset_Small" xml:space="preserve"><value>Small</value></data>
+  <data name="Preset_Medium" xml:space="preserve"><value>Medium</value></data>
+  <data name="Preset_Large" xml:space="preserve"><value>Large</value></data>
+  <data name="Preset_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Preset_Custom" xml:space="preserve"><value>Custom</value></data>
+  <data name="Preset_Description" xml:space="preserve"><value>Fits within {0} × {1} pixels</value></data>
+  <data name="Preset_CustomDescription" xml:space="preserve"><value>Use custom pixel dimensions</value></data>
+  <data name="ResizeMode_Fit" xml:space="preserve"><value>Fit — preserve aspect ratio</value></data>
+  <data name="ResizeMode_Fill" xml:space="preserve"><value>Fill — crop to target size</value></data>
+  <data name="ResizeMode_Stretch" xml:space="preserve"><value>Stretch — use exact dimensions</value></data>
+</root>

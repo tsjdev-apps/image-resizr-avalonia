@@ -20,6 +20,11 @@ public sealed record ResizeImagesResult(
     IReadOnlyList<string> OutputFiles)
 {
     /// <summary>
+    /// Gets the number of resized files that replaced an existing output file.
+    /// </summary>
+    public int OverwrittenFiles { get; init; }
+
+    /// <summary>
     /// Gets the estimated number of bytes saved by resizing the images.
     /// </summary>
     public long SavedBytes => Math.Max(0, InputBytes - OutputBytes);

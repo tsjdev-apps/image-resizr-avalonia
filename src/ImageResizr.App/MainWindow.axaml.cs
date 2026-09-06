@@ -1,5 +1,8 @@
+using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using ImageResizr.App.Localization;
 using ImageResizr.App.ViewModels;
 
 namespace ImageResizr.App;
@@ -28,8 +31,25 @@ public partial class MainWindow : Window
 
         DataContext = viewModel;
 
-        viewModel.PickInputFolderDelegate = () => PickFolderAsync("Choose the input folder");
-        viewModel.PickOutputFolderDelegate = () => PickFolderAsync("Choose the output folder");
+        viewModel.PickInputFolderDelegate = () => PickFolderAsync(Strings.SourceFolder_PickerTitle);
+        viewModel.PickOutputFolderDelegate = () => PickFolderAsync(Strings.TargetFolder_PickerTitle);
+        viewModel.ResizeHistory.CollectionChanged += ResizeHistoryOnCollectionChanged;
+        Closed += (_, _) => viewModel.ResizeHistory.CollectionChanged -= ResizeHistoryOnCollectionChanged;
+    }
+
+    /// <summary>
+    /// Keeps the most recently completed image visible while a batch is running.
+    /// </summary>
+    private void ResizeHistoryOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action != NotifyCollectionChangedAction.Add
+            || e.NewItems is not { Count: > 0 })
+        {
+            return;
+        }
+
+        object newestItem = e.NewItems[^1]!;
+        Dispatcher.UIThread.Post(() => HistoryList.ScrollIntoView(newestItem));
     }
 
     /// <summary>

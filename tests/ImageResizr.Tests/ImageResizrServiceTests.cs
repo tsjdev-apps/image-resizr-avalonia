@@ -40,7 +40,9 @@ public sealed class ImageResizrServiceTests
         Assert.Equal(2, result.TotalFiles);
         Assert.True(
             result.FailedFiles == 0,
-            string.Join(" | ", progress.Updates.Select(update => $"{update.Level}: {update.Message}")));
+            string.Join(" | ", progress.Updates.Select(update => update.Entry is null
+                ? "Batch update"
+                : $"{update.Entry.Status}: {update.Entry.FileName}")));
         Assert.Equal(0, result.SkippedFiles);
         Assert.Equal(2, result.ResizedFiles);
         await AssertImageDimensionsAsync(Path.Combine(workspace.OutputFolder, "camera.PNG"), 60, 40);
@@ -48,7 +50,14 @@ public sealed class ImageResizrServiceTests
         Assert.False(File.Exists(Path.Combine(workspace.OutputFolder, "notes.txt")));
         Assert.False(File.Exists(Path.Combine(workspace.OutputFolder, "legacy-scan.tif")));
         Assert.False(File.Exists(Path.Combine(workspace.OutputFolder, "legacy-photo.tiff")));
-        Assert.Contains(progress.Updates, update => update.Message.Contains("camera.PNG", StringComparison.Ordinal));
+        ResizeEntry cameraEntry = Assert.Single(
+            progress.Updates,
+            update => update.Entry?.FileName == "camera.PNG").Entry!;
+        Assert.Equal(ResizeStatus.Resized, cameraEntry.Status);
+        Assert.Equal(120, cameraEntry.OriginalWidth);
+        Assert.Equal(80, cameraEntry.OriginalHeight);
+        Assert.Equal(60, cameraEntry.NewWidth);
+        Assert.Equal(40, cameraEntry.NewHeight);
     }
 
     /// <summary>
@@ -86,6 +95,7 @@ public sealed class ImageResizrServiceTests
         using TestWorkspace workspace = new();
         await workspace.CreateInputImageAsync("camera.png", 120, 80);
         string existingOutputPath = workspace.CreateOutputFile("camera.png", "existing content");
+        ListProgress progress = new();
         ImageResizrService service = new();
 
         ResizeImagesResult result = await service.ResizeAsync(
@@ -98,12 +108,16 @@ public sealed class ImageResizrServiceTests
                 ShrinkOnly: true,
                 IgnoreOrientation: true,
                 OverwriteExisting: false),
-            cancellationToken: TestContext.Current.CancellationToken);
+            progress,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result.TotalFiles);
         Assert.Equal(0, result.ResizedFiles);
         Assert.Equal(1, result.SkippedFiles);
         Assert.Equal("existing content", await File.ReadAllTextAsync(existingOutputPath, TestContext.Current.CancellationToken));
+        ResizeEntry entry = Assert.Single(progress.Updates, update => update.Entry is not null).Entry!;
+        Assert.Equal(ResizeStatus.Skipped, entry.Status);
+        Assert.Equal(ResizeSkipReason.OutputFileExists, entry.SkipReason);
     }
 
     /// <summary>
@@ -115,6 +129,7 @@ public sealed class ImageResizrServiceTests
         using TestWorkspace workspace = new();
         await workspace.CreateInputImageAsync("camera.png", 120, 80);
         workspace.CreateOutputFile("camera.png", "existing content");
+        ListProgress progress = new();
         ImageResizrService service = new();
 
         ResizeImagesResult result = await service.ResizeAsync(
@@ -127,10 +142,14 @@ public sealed class ImageResizrServiceTests
                 ShrinkOnly: true,
                 IgnoreOrientation: true,
                 OverwriteExisting: true),
-            cancellationToken: TestContext.Current.CancellationToken);
+            progress,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result.ResizedFiles);
+        Assert.Equal(1, result.OverwrittenFiles);
         await AssertImageDimensionsAsync(Path.Combine(workspace.OutputFolder, "camera.png"), 60, 40);
+        ResizeEntry entry = Assert.Single(progress.Updates, update => update.Entry is not null).Entry!;
+        Assert.Equal(ResizeStatus.Overwritten, entry.Status);
     }
 
     /// <summary>
@@ -141,6 +160,7 @@ public sealed class ImageResizrServiceTests
     {
         using TestWorkspace workspace = new();
         await workspace.CreateInputImageAsync("small.png", 40, 30);
+        ListProgress progress = new();
         ImageResizrService service = new();
 
         ResizeImagesResult result = await service.ResizeAsync(
@@ -153,11 +173,18 @@ public sealed class ImageResizrServiceTests
                 ShrinkOnly: true,
                 IgnoreOrientation: true,
                 OverwriteExisting: false),
-            cancellationToken: TestContext.Current.CancellationToken);
+            progress,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(0, result.ResizedFiles);
         Assert.Equal(1, result.SkippedFiles);
         await AssertImageDimensionsAsync(Path.Combine(workspace.OutputFolder, "small.png"), 40, 30);
+        ResizeEntry entry = Assert.Single(progress.Updates, update => update.Entry is not null).Entry!;
+        Assert.Equal(ResizeSkipReason.AlreadyCorrectSize, entry.SkipReason);
+        Assert.Equal(40, entry.OriginalWidth);
+        Assert.Equal(30, entry.OriginalHeight);
+        Assert.Equal(40, entry.NewWidth);
+        Assert.Equal(30, entry.NewHeight);
     }
 
     /// <summary>
@@ -223,10 +250,12 @@ public sealed class ImageResizrServiceTests
         Assert.Equal(Math.Max(0, expectedInputBytes - expectedOutputBytes), result.SavedBytes);
         Assert.Contains(
             progress.Updates,
-            update => update.Level == ResizeProgressLevel.Error
-                && update.Message.Contains("broken.jpg", StringComparison.Ordinal)
-                && (update.Message.Contains("could not be decoded", StringComparison.Ordinal)
-                    || update.Message.Contains("unsupported image format", StringComparison.Ordinal)));
+            update => update.Entry is
+            {
+                Status: ResizeStatus.Failed,
+                FileName: "broken.jpg",
+                ErrorMessage: not null
+            });
     }
 
     /// <summary>

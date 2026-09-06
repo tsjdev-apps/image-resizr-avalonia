@@ -1,6 +1,9 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ImageResizr.App.Localization;
 using ImageResizr.Core.Models;
 using ImageResizr.Core.Services;
 
@@ -9,28 +12,48 @@ namespace ImageResizr.App.ViewModels;
 /// <summary>
 /// Provides bindable state and commands for the main image resize window.
 /// </summary>
-/// <param name="imageResizrService">The service used to resize images.</param>
-public sealed partial class MainWindowViewModel(
-    IImageResizrService imageResizrService) : ObservableObject
+public sealed partial class MainWindowViewModel : ObservableObject
 {
-    /// <summary>
-    /// Gets the available resize preset options.
-    /// </summary>
-    public IReadOnlyList<ResizePresetOption> Presets => ResizePresetOption.All;
+    private readonly IImageResizrService imageResizrService;
 
     /// <summary>
-    /// Gets the available resize modes.
+    /// Initializes a new main-window view model.
     /// </summary>
-    public IReadOnlyList<ImageResizeMode> ResizeModes { get; } =
-    [
-        ImageResizeMode.Fit,
-        ImageResizeMode.Fill,
-        ImageResizeMode.Stretch
-    ];
+    public MainWindowViewModel(IImageResizrService imageResizrService)
+    {
+        this.imageResizrService = imageResizrService;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether a resize operation is running.
-    /// </summary>
+        Presets =
+        [
+            new(ResizePresetOption.Small, Strings.Preset_Small),
+            new(ResizePresetOption.Medium, Strings.Preset_Medium),
+            new(ResizePresetOption.Large, Strings.Preset_Large),
+            new(ResizePresetOption.Phone, Strings.Preset_Phone),
+            new(ResizePresetOption.Custom, Strings.Preset_Custom)
+        ];
+        SelectedPreset = Presets[0];
+
+        ResizeModes =
+        [
+            new(ImageResizeMode.Fit, Strings.ResizeMode_Fit),
+            new(ImageResizeMode.Fill, Strings.ResizeMode_Fill),
+            new(ImageResizeMode.Stretch, Strings.ResizeMode_Stretch)
+        ];
+        SelectedResizeMode = ResizeModes[0];
+
+        ResizeHistory.CollectionChanged += ResizeHistoryOnCollectionChanged;
+    }
+
+    /// <summary>Gets the available localized resize presets.</summary>
+    public IReadOnlyList<ResizePresetItemViewModel> Presets { get; }
+
+    /// <summary>Gets the available localized resize modes.</summary>
+    public IReadOnlyList<ResizeModeItemViewModel> ResizeModes { get; }
+
+    /// <summary>Gets the results produced during the current resize operation.</summary>
+    public ObservableCollection<ResizeHistoryItemViewModel> ResizeHistory { get; } = [];
+
+    /// <summary>Gets or sets whether a resize operation is running.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartCommand))]
     [NotifyPropertyChangedFor(nameof(CanEditInputs))]
@@ -38,179 +61,133 @@ public sealed partial class MainWindowViewModel(
     [NotifyPropertyChangedFor(nameof(StartButtonText))]
     public partial bool IsBusy { get; set; }
 
-    /// <summary>
-    /// Gets or sets the selected input folder path.
-    /// </summary>
+    /// <summary>Gets or sets the selected source folder path.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartCommand))]
     public partial string InputFolder { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the selected output folder path.
-    /// </summary>
+    /// <summary>Gets or sets the selected target folder path.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartCommand))]
     public partial string OutputFolder { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the selected resize preset.
-    /// </summary>
+    /// <summary>Gets or sets the selected resize preset.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsCustomPreset))]
     [NotifyPropertyChangedFor(nameof(CanEditCustomDimensions))]
-    public partial ResizePresetOption SelectedPreset { get; set; } = ResizePresetOption.Small;
+    public partial ResizePresetItemViewModel SelectedPreset { get; set; }
 
-    /// <summary>
-    /// Gets or sets the target width in pixels.
-    /// </summary>
+    /// <summary>Gets or sets the target width in pixels.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartCommand))]
     public partial int TargetWidth { get; set; } = ResizePresetOption.Small.Width;
 
-    /// <summary>
-    /// Gets or sets the target height in pixels.
-    /// </summary>
+    /// <summary>Gets or sets the target height in pixels.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartCommand))]
     public partial int TargetHeight { get; set; } = ResizePresetOption.Small.Height;
 
-    /// <summary>
-    /// Gets or sets the selected resize mode.
-    /// </summary>
+    /// <summary>Gets or sets the selected resize mode.</summary>
     [ObservableProperty]
-    public partial ImageResizeMode SelectedResizeMode { get; set; } = ImageResizeMode.Fit;
+    public partial ResizeModeItemViewModel SelectedResizeMode { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether images should only be reduced in size.
-    /// </summary>
+    /// <summary>Gets or sets whether images should only be reduced in size.</summary>
     [ObservableProperty]
     public partial bool ShrinkOnly { get; set; } = true;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether EXIF orientation should be ignored.
-    /// </summary>
+    /// <summary>Gets or sets whether EXIF orientation should be ignored.</summary>
     [ObservableProperty]
     public partial bool IgnoreOrientation { get; set; } = true;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether existing output files should be replaced.
-    /// </summary>
+    /// <summary>Gets or sets whether existing output files should be replaced.</summary>
     [ObservableProperty]
     public partial bool OverwriteExisting { get; set; }
 
-    /// <summary>
-    /// Gets or sets the current validation message.
-    /// </summary>
+    /// <summary>Gets or sets the current localized validation message.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasValidationMessage))]
     public partial string ValidationMessage { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the number of files processed so far.
-    /// </summary>
+    /// <summary>Gets or sets the number of files processed so far.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProgressSummary))]
+    [NotifyPropertyChangedFor(nameof(ProgressPercentage))]
     [NotifyPropertyChangedFor(nameof(ProgressPercentageText))]
     public partial int ProgressValue { get; set; }
 
-    /// <summary>
-    /// Gets or sets the total number of files to process.
-    /// </summary>
+    /// <summary>Gets or sets the total number of files in the current batch.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProgressSummary))]
+    [NotifyPropertyChangedFor(nameof(ProgressPercentage))]
     [NotifyPropertyChangedFor(nameof(ProgressPercentageText))]
-    public partial int ProgressMaximum { get; set; } = 1;
+    [NotifyPropertyChangedFor(nameof(ProgressBarMaximum))]
+    public partial int ProgressMaximum { get; set; }
 
-    /// <summary>
-    /// Gets or sets the primary status message.
-    /// </summary>
+    /// <summary>Gets or sets the primary localized status message.</summary>
     [ObservableProperty]
-    public partial string StatusMessage { get; set; } = "Choose folders, pick a size, and start the batch.";
+    public partial string StatusMessage { get; set; } = Strings.Status_Ready;
 
-    /// <summary>
-    /// Gets or sets the latest detailed activity message.
-    /// </summary>
-    [ObservableProperty]
-    public partial string LatestActivityMessage { get; set; } = "No resize activity yet.";
-
-    /// <summary>
-    /// Gets or sets the severity level of the latest activity message.
-    /// </summary>
-    [ObservableProperty]
-    public partial ResizeProgressLevel LatestActivityLevel { get; set; } = ResizeProgressLevel.Info;
-
-    /// <summary>
-    /// Gets a value indicating whether input controls can be edited.
-    /// </summary>
+    /// <summary>Gets whether input controls can be edited.</summary>
     public bool CanEditInputs => !IsBusy;
 
-    /// <summary>
-    /// Gets a value indicating whether the selected preset uses custom dimensions.
-    /// </summary>
+    /// <summary>Gets whether the selected preset uses custom dimensions.</summary>
     public bool IsCustomPreset => SelectedPreset.IsCustom;
 
-    /// <summary>
-    /// Gets a value indicating whether custom width and height controls can be edited.
-    /// </summary>
+    /// <summary>Gets whether custom dimension controls can be edited.</summary>
     public bool CanEditCustomDimensions => CanEditInputs && IsCustomPreset;
 
-    /// <summary>
-    /// Gets a value indicating whether a validation message should be shown.
-    /// </summary>
+    /// <summary>Gets whether a validation message should be shown.</summary>
     public bool HasValidationMessage => !string.IsNullOrWhiteSpace(ValidationMessage);
 
-    /// <summary>
-    /// Gets the progress summary text.
-    /// </summary>
-    public string ProgressSummary => $"{ProgressValue.ToString(CultureInfo.CurrentCulture)} / {ProgressMaximum.ToString(CultureInfo.CurrentCulture)} files processed";
+    /// <summary>Gets whether the current resize history contains entries.</summary>
+    public bool HasHistory => ResizeHistory.Count > 0;
 
-    /// <summary>
-    /// Gets the progress percentage text.
-    /// </summary>
-    public string ProgressPercentageText => ProgressMaximum <= 0
-        ? "0%"
-        : $"{Math.Round((double)ProgressValue / ProgressMaximum * 100, MidpointRounding.AwayFromZero).ToString(CultureInfo.CurrentCulture)}%";
+    /// <summary>Gets the localized processed-file summary.</summary>
+    public string ProgressSummary => Strings.Format(
+        ProgressMaximum == 1 ? "Progress_ProcessedFile" : "Progress_ProcessedFiles",
+        ProgressValue,
+        ProgressMaximum);
 
-    /// <summary>
-    /// Gets the text shown on the start button.
-    /// </summary>
-    public string StartButtonText => IsBusy ? "Resizing images..." : "Resize images";
+    /// <summary>Gets a safe maximum for the progress-bar control.</summary>
+    public int ProgressBarMaximum => Math.Max(1, ProgressMaximum);
 
-    /// <summary>
-    /// Gets or sets the delegate used to pick an input folder.
-    /// </summary>
+    /// <summary>Gets the current whole-number progress percentage.</summary>
+    public int ProgressPercentage => ProgressMaximum <= 0
+        ? 0
+        : (int)Math.Round((double)ProgressValue / ProgressMaximum * 100, MidpointRounding.AwayFromZero);
+
+    /// <summary>Gets the localized progress percentage text.</summary>
+    public string ProgressPercentageText => $"{ProgressPercentage.ToString(CultureInfo.CurrentCulture)}%";
+
+    /// <summary>Gets the localized text shown on the start button.</summary>
+    public string StartButtonText => IsBusy ? Strings.ResizingImages_Button : Strings.ResizeImages_Button;
+
+    /// <summary>Gets or sets the delegate used to pick a source folder.</summary>
     public Func<Task<string?>>? PickInputFolderDelegate { get; set; }
 
-    /// <summary>
-    /// Gets or sets the delegate used to pick an output folder.
-    /// </summary>
+    /// <summary>Gets or sets the delegate used to pick a target folder.</summary>
     public Func<Task<string?>>? PickOutputFolderDelegate { get; set; }
 
-    /// <summary>
-    /// Updates target dimensions when the selected preset changes.
-    /// </summary>
-    partial void OnSelectedPresetChanged(ResizePresetOption value)
+    /// <summary>Updates target dimensions when the selected preset changes.</summary>
+    partial void OnSelectedPresetChanged(ResizePresetItemViewModel value)
     {
         if (!value.IsCustom)
         {
-            TargetWidth = value.Width;
-            TargetHeight = value.Height;
+            TargetWidth = value.Preset.Width;
+            TargetHeight = value.Preset.Height;
         }
     }
 
-    /// <summary>
-    /// Starts the resize operation with the current user selections.
-    /// </summary>
+    /// <summary>Starts the resize operation with the current selections.</summary>
     [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanStart))]
     private async Task StartAsync(CancellationToken cancellationToken)
     {
         ValidationMessage = string.Empty;
         IsBusy = true;
         ProgressValue = 0;
-        ProgressMaximum = 1;
-        StatusMessage = "Preparing the resize operation.";
-        LatestActivityMessage = string.Empty;
-        LatestActivityLevel = ResizeProgressLevel.Info;
+        ProgressMaximum = 0;
+        StatusMessage = Strings.Status_Preparing;
+        ResizeHistory.Clear();
         int acceptProgressUpdates = 1;
 
         Progress<ResizeProgressUpdate> progress = new(update =>
@@ -220,10 +197,18 @@ public sealed partial class MainWindowViewModel(
                 return;
             }
 
-            ProgressMaximum = Math.Max(1, update.TotalCount);
-            ProgressValue = Math.Min(update.ProcessedCount, ProgressMaximum);
-            LatestActivityMessage = update.Message;
-            LatestActivityLevel = update.Level;
+            ProgressMaximum = Math.Max(0, update.TotalCount);
+            ProgressValue = Math.Clamp(update.ProcessedCount, 0, ProgressMaximum);
+
+            if (update.TotalCount > 0)
+            {
+                StatusMessage = Strings.Status_Running;
+            }
+
+            if (update.Entry is not null)
+            {
+                ResizeHistory.Add(new ResizeHistoryItemViewModel(update.Entry));
+            }
         });
 
         try
@@ -233,7 +218,7 @@ public sealed partial class MainWindowViewModel(
                 OutputFolder,
                 TargetWidth,
                 TargetHeight,
-                SelectedResizeMode,
+                SelectedResizeMode.Mode,
                 ShrinkOnly,
                 IgnoreOrientation,
                 OverwriteExisting);
@@ -241,40 +226,37 @@ public sealed partial class MainWindowViewModel(
             ResizeImagesResult result = await imageResizrService.ResizeAsync(request, progress, cancellationToken);
             Volatile.Write(ref acceptProgressUpdates, 0);
 
-            ProgressMaximum = Math.Max(1, result.TotalFiles);
+            ProgressMaximum = result.TotalFiles;
             ProgressValue = result.TotalFiles;
 
-            if (result.TotalFiles == 0)
+            if (result.TotalFiles > 0)
             {
-                StatusMessage = "The input folder did not contain any supported image files.";
-                LatestActivityMessage = FormatCompletionSummary(result);
-                LatestActivityLevel = ResizeProgressLevel.Warning;
-                return;
+                ResizeHistory.Add(ResizeHistoryItemViewModel.CreateSummary(result));
             }
 
-            StatusMessage = "Resize operation completed.";
-            LatestActivityLevel = result.FailedFiles > 0 ? ResizeProgressLevel.Warning : ResizeProgressLevel.Success;
-            LatestActivityMessage = FormatCompletionSummary(result);
+            StatusMessage = result.TotalFiles == 0
+                ? Strings.Status_NoSupportedFiles
+                : $"{Strings.Status_Completed} {FormatCompletionSummary(result)}";
         }
         catch (ArgumentException exception)
         {
             Volatile.Write(ref acceptProgressUpdates, 0);
-            HandleExpectedFailure("Please review the folders and resize settings, then try again.", exception.Message);
+            HandleExpectedFailure(Strings.Status_ReviewSettings, GetValidationMessage(exception));
         }
-        catch (DirectoryNotFoundException exception)
+        catch (DirectoryNotFoundException)
         {
             Volatile.Write(ref acceptProgressUpdates, 0);
-            HandleExpectedFailure("The input folder could not be found.", exception.Message);
+            HandleExpectedFailure(Strings.Status_InputFolderMissing, Strings.Status_InputFolderMissing);
         }
-        catch (IOException exception)
+        catch (IOException)
         {
             Volatile.Write(ref acceptProgressUpdates, 0);
-            HandleExpectedFailure("A file-system error interrupted the resize operation.", exception.Message);
+            HandleExpectedFailure(Strings.Status_FileSystemError, Strings.Status_FileSystemError);
         }
-        catch (UnauthorizedAccessException exception)
+        catch (UnauthorizedAccessException)
         {
             Volatile.Write(ref acceptProgressUpdates, 0);
-            HandleExpectedFailure("The app does not have permission to access one of the selected folders.", exception.Message);
+            HandleExpectedFailure(Strings.Status_AccessDenied, Strings.Status_AccessDenied);
         }
         finally
         {
@@ -283,37 +265,30 @@ public sealed partial class MainWindowViewModel(
         }
     }
 
-    /// <summary>
-    /// Picks the input folder by using the assigned folder picker delegate.
-    /// </summary>
+    /// <summary>Picks the source folder using the view-provided delegate.</summary>
     [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task PickInputFolderAsync()
     {
         if (PickInputFolderDelegate is null)
         {
-            throw new InvalidOperationException("No folder-pick delegate assigned. The view must assign PickInputFolderDelegate.");
+            throw new InvalidOperationException("No folder-pick delegate is assigned.");
         }
 
         InputFolder = await PickInputFolderDelegate() ?? string.Empty;
     }
 
-    /// <summary>
-    /// Picks the output folder by using the assigned folder picker delegate.
-    /// </summary>
+    /// <summary>Picks the target folder using the view-provided delegate.</summary>
     [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task PickOutputFolderAsync()
     {
         if (PickOutputFolderDelegate is null)
         {
-            throw new InvalidOperationException("No folder-pick delegate assigned. The view must assign PickOutputFolderDelegate.");
+            throw new InvalidOperationException("No folder-pick delegate is assigned.");
         }
 
         OutputFolder = await PickOutputFolderDelegate() ?? string.Empty;
     }
 
-    /// <summary>
-    /// Determines whether the resize operation can be started.
-    /// </summary>
     private bool CanStart()
     {
         return !IsBusy
@@ -323,37 +298,40 @@ public sealed partial class MainWindowViewModel(
                && TargetHeight > 0;
     }
 
-    /// <summary>
-    /// Shows a recoverable failure in the view model state.
-    /// </summary>
-    private void HandleExpectedFailure(
-        string status,
-        string details)
+    private void ResizeHistoryOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(HasHistory));
+    }
+
+    private void HandleExpectedFailure(string status, string details)
     {
         StatusMessage = status;
-        LatestActivityMessage = details;
-        LatestActivityLevel = ResizeProgressLevel.Error;
         ValidationMessage = details;
     }
 
-    /// <summary>
-    /// Formats a byte count as megabytes.
-    /// </summary>
+    private static string GetValidationMessage(ArgumentException exception)
+    {
+        return exception.ParamName switch
+        {
+            nameof(ResizeImagesRequest.InputFolder) => Strings.Get("Validation_InputFolderRequired"),
+            nameof(ResizeImagesRequest.OutputFolder) => Strings.Get("Validation_OutputFolderRequired"),
+            nameof(ResizeImagesRequest.TargetWidth) or nameof(ResizeImagesRequest.TargetHeight) =>
+                Strings.Get("Validation_DimensionsPositive"),
+            _ => Strings.Status_ReviewSettings
+        };
+    }
+
     private static string FormatBytes(long bytes)
     {
         double megabytes = bytes / (1024.0 * 1024.0);
         return $"{megabytes.ToString("F2", CultureInfo.CurrentCulture)} MB";
     }
 
-    /// <summary>
-    /// Formats the final completion summary for a resize operation.
-    /// </summary>
     private static string FormatCompletionSummary(ResizeImagesResult result)
     {
-        string imageText = result.TotalFiles == 1
-            ? "1 image"
-            : $"{result.TotalFiles.ToString(CultureInfo.CurrentCulture)} images";
-
-        return $"{imageText} processed. {FormatBytes(result.SavedBytes)} saved.";
+        return Strings.Format(
+            result.TotalFiles == 1 ? "Completion_One" : "Completion_Many",
+            result.TotalFiles,
+            FormatBytes(result.SavedBytes));
     }
 }

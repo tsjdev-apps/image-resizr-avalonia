@@ -2,104 +2,144 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:semi="https://irihi.tech/semi"
              x:Class="ImageResizr.App.App"
-             RequestedThemeVariant="Light">
+             RequestedThemeVariant="Default">
 
     <Application.Resources>
-        <SolidColorBrush x:Key="ButtonSolidPrimaryBackground" Color="#FF914D" />
-        <SolidColorBrush x:Key="ButtonSolidPrimaryBorderBrush" Color="#FF914D" />
-        <SolidColorBrush x:Key="ButtonSolidPrimaryPointeroverBackground" Color="#F57F38" />
-        <SolidColorBrush x:Key="ButtonSolidPrimaryPointeroverBorderBrush" Color="#F57F38" />
-        <SolidColorBrush x:Key="ButtonSolidPrimaryPressedBackground" Color="#E66F28" />
-        <SolidColorBrush x:Key="ButtonSolidPrimaryPressedBorderBrush" Color="#E66F28" />
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppPageBackgroundBrush" Color="#F5F7FA" />
+                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#DEE5EE" />
+                    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="#F7F9FC" />
+                    <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#0F172A" />
+                    <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#475569" />
+                    <SolidColorBrush x:Key="AppMutedTextBrush" Color="#64748B" />
+                    <SolidColorBrush x:Key="AppProgressBackgroundBrush" Color="#FFF0E8" />
+                    <SolidColorBrush x:Key="AppValidationBackgroundBrush" Color="#FEF2F2" />
+                    <SolidColorBrush x:Key="AppValidationBorderBrush" Color="#FCA5A5" />
+                    <SolidColorBrush x:Key="AppValidationTextBrush" Color="#B91C1C" />
+                    <SolidColorBrush x:Key="AppSeparatorBrush" Color="#E2E8F0" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppPageBackgroundBrush" Color="#10151D" />
+                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#171E28" />
+                    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#2B3645" />
+                    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="#1E2733" />
+                    <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#F1F5F9" />
+                    <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#CBD5E1" />
+                    <SolidColorBrush x:Key="AppMutedTextBrush" Color="#94A3B8" />
+                    <SolidColorBrush x:Key="AppProgressBackgroundBrush" Color="#342319" />
+                    <SolidColorBrush x:Key="AppValidationBackgroundBrush" Color="#3A1E24" />
+                    <SolidColorBrush x:Key="AppValidationBorderBrush" Color="#7F3542" />
+                    <SolidColorBrush x:Key="AppValidationTextBrush" Color="#FCA5A5" />
+                    <SolidColorBrush x:Key="AppSeparatorBrush" Color="#2B3645" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-        <SolidColorBrush x:Key="CheckBoxCheckedDefaultBackground" Color="#FF914D" />
-        <SolidColorBrush x:Key="CheckBoxCheckedDefaultBorderBrush" Color="#FF914D" />
-        <SolidColorBrush x:Key="CheckBoxCheckedDisabledBackground" Color="#FFD8BF" />
-        <SolidColorBrush x:Key="CheckBoxCheckedDisabledBorderBrush" Color="#FFD8BF" />
-        <SolidColorBrush x:Key="CheckBoxCheckedPointeroverBackground" Color="#F57F38" />
-        <SolidColorBrush x:Key="CheckBoxCheckedPointeroverBorderBrush" Color="#F57F38" />
-        <SolidColorBrush x:Key="CheckBoxCheckedPressedBackground" Color="#E66F28" />
-        <SolidColorBrush x:Key="CheckBoxCheckedPressedBorderBrush" Color="#E66F28" />
-        <SolidColorBrush x:Key="CheckBoxPointeroverBorderBrush" Color="#F57F38" />
-        <SolidColorBrush x:Key="CheckBoxPressedBorderBrush" Color="#E66F28" />
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#FF914D" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#F57F38" />
+            <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#E66F28" />
+            <SolidColorBrush x:Key="AppAccentForegroundBrush" Color="#FFFFFF" />
+
+            <SolidColorBrush x:Key="ButtonSolidPrimaryBackground" Color="#FF914D" />
+            <SolidColorBrush x:Key="ButtonSolidPrimaryBorderBrush" Color="#FF914D" />
+            <SolidColorBrush x:Key="ButtonSolidPrimaryPointeroverBackground" Color="#F57F38" />
+            <SolidColorBrush x:Key="ButtonSolidPrimaryPointeroverBorderBrush" Color="#F57F38" />
+            <SolidColorBrush x:Key="ButtonSolidPrimaryPressedBackground" Color="#E66F28" />
+            <SolidColorBrush x:Key="ButtonSolidPrimaryPressedBorderBrush" Color="#E66F28" />
+            <SolidColorBrush x:Key="CheckBoxCheckedDefaultBackground" Color="#FF914D" />
+            <SolidColorBrush x:Key="CheckBoxCheckedDefaultBorderBrush" Color="#FF914D" />
+            <SolidColorBrush x:Key="CheckBoxCheckedDisabledBackground" Color="#FFD8BF" />
+            <SolidColorBrush x:Key="CheckBoxCheckedDisabledBorderBrush" Color="#FFD8BF" />
+            <SolidColorBrush x:Key="CheckBoxCheckedPointeroverBackground" Color="#F57F38" />
+            <SolidColorBrush x:Key="CheckBoxCheckedPointeroverBorderBrush" Color="#F57F38" />
+            <SolidColorBrush x:Key="CheckBoxCheckedPressedBackground" Color="#E66F28" />
+            <SolidColorBrush x:Key="CheckBoxCheckedPressedBorderBrush" Color="#E66F28" />
+            <SolidColorBrush x:Key="CheckBoxPointeroverBorderBrush" Color="#F57F38" />
+            <SolidColorBrush x:Key="CheckBoxPressedBorderBrush" Color="#E66F28" />
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <semi:SemiTheme Locale="en-US" />
 
         <Style Selector="Button.Primary">
-            <Setter Property="Background" Value="#FF914D" />
-            <Setter Property="BorderBrush" Value="#FF914D" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}" />
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
-
         <Style Selector="Button.Primary:pointerover">
-            <Setter Property="Background" Value="#F57F38" />
-            <Setter Property="BorderBrush" Value="#F57F38" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource AppAccentHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppAccentHoverBrush}" />
         </Style>
-
         <Style Selector="Button.Primary:pressed">
-            <Setter Property="Background" Value="#E66F28" />
-            <Setter Property="BorderBrush" Value="#E66F28" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource AppAccentPressedBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppAccentPressedBrush}" />
         </Style>
-
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="Background" Value="{DynamicResource AppCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="24" />
             <Setter Property="Padding" Value="24" />
         </Style>
-
         <Style Selector="Border.panel">
-            <Setter Property="Background" Value="#F8FAFC" />
-            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="Background" Value="{DynamicResource AppPanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="16" />
-        </Style>
-
-        <Style Selector="Border.info">
-            <Setter Property="Background" Value="#FFF0E8" />
             <Setter Property="CornerRadius" Value="18" />
             <Setter Property="Padding" Value="16" />
         </Style>
-
+        <Style Selector="Border.progress-panel">
+            <Setter Property="Background" Value="{DynamicResource AppProgressBackgroundBrush}" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
         <Style Selector="Border.validation">
-            <Setter Property="Background" Value="#FEF2F2" />
-            <Setter Property="BorderBrush" Value="#FCA5A5" />
+            <Setter Property="Background" Value="{DynamicResource AppValidationBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppValidationBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="14" />
             <Setter Property="Padding" Value="12" />
         </Style>
-
-        <Style Selector="Border.tag">
-            <Setter Property="Background" Value="#F1F5F9" />
-            <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="Margin" Value="0,0,8,8" />
-            <Setter Property="Padding" Value="12,6" />
+        <Style Selector="Border.history-row">
+            <Setter Property="BorderBrush" Value="{DynamicResource AppSeparatorBrush}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="4,10" />
         </Style>
-
         <Style Selector="TextBlock.heading-large">
-            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontSize" Value="25" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="#0F172A" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
         </Style>
-
         <Style Selector="TextBlock.heading-medium">
             <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="#0F172A" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
         </Style>
-
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
+        </Style>
         <Style Selector="TextBlock.body-text">
-            <Setter Property="Foreground" Value="#475569" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
         </Style>
-
+        <Style Selector="TextBlock.muted-text">
+            <Setter Property="Foreground" Value="{DynamicResource AppMutedTextBrush}" />
+        </Style>
         <Style Selector="TextBlock.accent">
-            <Setter Property="Foreground" Value="#FF914D" />
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentBrush}" />
+        </Style>
+        <Style Selector="ListBox.history-list">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="ListBox.history-list > ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="0" />
         </Style>
     </Application.Styles>
 </Application>
