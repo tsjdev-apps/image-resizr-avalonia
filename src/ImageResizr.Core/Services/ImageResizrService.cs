@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Globalization;
 using ImageResizr.Core.Models;
 using SkiaSharp;
 
@@ -58,7 +57,7 @@ public sealed class ImageResizrService : IImageResizrService
 
         _ = Directory.CreateDirectory(outputFolder);
 
-        progress?.Report(new ResizeProgressUpdate(0, 0, "Scanning the input folder for supported image files."));
+        progress?.Report(new ResizeProgressUpdate(0, 0));
 
         List<string> sourceFiles = [.. Directory
             .EnumerateFiles(inputFolder, "*", SearchOption.TopDirectoryOnly)
@@ -67,11 +66,14 @@ public sealed class ImageResizrService : IImageResizrService
 
         if (sourceFiles.Count == 0)
         {
-            progress?.Report(new ResizeProgressUpdate(0, 0, "No supported image files were found in the input folder."));
+            progress?.Report(new ResizeProgressUpdate(0, 0));
             return new ResizeImagesResult(0, 0, 0, 0, 0, 0, []);
         }
 
+        progress?.Report(new ResizeProgressUpdate(0, sourceFiles.Count));
+
         int resizedFiles = 0;
+        int overwrittenFiles = 0;
         int skippedFiles = 0;
         int failedFiles = 0;
         long inputBytes = 0;
@@ -91,17 +93,28 @@ public sealed class ImageResizrService : IImageResizrService
             string sourceFile = sourceFiles[index];
             string destinationFile = Path.Combine(outputFolder, Path.GetFileName(sourceFile));
             int processedCount = index + 1;
+            bool destinationExisted = File.Exists(destinationFile);
 
-            if (File.Exists(destinationFile) && !validatedRequest.OverwriteExisting)
+            if (destinationExisted && !validatedRequest.OverwriteExisting)
             {
                 skippedFiles++;
                 progress?.Report(new ResizeProgressUpdate(
                     processedCount,
                     sourceFiles.Count,
-                    $"Skipped '{Path.GetFileName(sourceFile)}' because it already exists in the output folder.",
-                    ResizeProgressLevel.Warning));
+                    new ResizeEntry(
+                        Path.GetFileName(sourceFile),
+                        OriginalWidth: null,
+                        OriginalHeight: null,
+                        NewWidth: null,
+                        NewHeight: null,
+                        ResizeStatus.Skipped,
+                        destinationFile,
+                        ResizeSkipReason.OutputFileExists)));
                 continue;
             }
+
+            int? originalWidth = null;
+            int? originalHeight = null;
 
             try
             {
@@ -114,6 +127,8 @@ public sealed class ImageResizrService : IImageResizrService
                     ? null
                     : ApplyOrientation(decodedBitmap, encodedOrigin);
                 SKBitmap workingBitmap = orientedBitmap ?? decodedBitmap;
+                originalWidth = workingBitmap.Width;
+                originalHeight = workingBitmap.Height;
 
                 ResizePlan resizePlan = BuildResizePlan(workingBitmap.Width, workingBitmap.Height, validatedRequest);
 
@@ -132,8 +147,15 @@ public sealed class ImageResizrService : IImageResizrService
                     progress?.Report(new ResizeProgressUpdate(
                         processedCount,
                         sourceFiles.Count,
-                        $"Kept '{Path.GetFileName(sourceFile)}' unchanged because it is already within the target size.",
-                        ResizeProgressLevel.Info));
+                        new ResizeEntry(
+                            Path.GetFileName(sourceFile),
+                            originalWidth,
+                            originalHeight,
+                            originalWidth,
+                            originalHeight,
+                            ResizeStatus.Skipped,
+                            File.Exists(destinationFile) ? destinationFile : null,
+                            ResizeSkipReason.AlreadyCorrectSize)));
                     continue;
                 }
 
@@ -141,6 +163,12 @@ public sealed class ImageResizrService : IImageResizrService
                 await SaveImageAsync(resizedBitmap, destinationFile, validatedRequest.OverwriteExisting, cancellationToken);
 
                 resizedFiles++;
+
+                if (destinationExisted)
+                {
+                    overwrittenFiles++;
+                }
+
                 inputBytes += sourceBytes;
                 outputFiles.Add(destinationFile);
                 outputBytes += new FileInfo(destinationFile).Length;
@@ -148,8 +176,14 @@ public sealed class ImageResizrService : IImageResizrService
                 progress?.Report(new ResizeProgressUpdate(
                     processedCount,
                     sourceFiles.Count,
-                    $"Resized '{Path.GetFileName(sourceFile)}' to {resizePlan.Width.ToString(CultureInfo.CurrentCulture)} x {resizePlan.Height.ToString(CultureInfo.CurrentCulture)} pixels.",
-                    ResizeProgressLevel.Success));
+                    new ResizeEntry(
+                        Path.GetFileName(sourceFile),
+                        originalWidth,
+                        originalHeight,
+                        resizePlan.Width,
+                        resizePlan.Height,
+                        destinationExisted ? ResizeStatus.Overwritten : ResizeStatus.Resized,
+                        destinationFile)));
             }
             catch (Exception exception) when (
                 exception is InvalidDataException
@@ -158,7 +192,14 @@ public sealed class ImageResizrService : IImageResizrService
                 or UnauthorizedAccessException)
             {
                 failedFiles++;
-                ReportFailure(progress, processedCount, sourceFiles.Count, sourceFile, exception.Message);
+                ReportFailure(
+                    progress,
+                    processedCount,
+                    sourceFiles.Count,
+                    sourceFile,
+                    originalWidth,
+                    originalHeight,
+                    exception.Message);
             }
         }
 
@@ -169,7 +210,10 @@ public sealed class ImageResizrService : IImageResizrService
             failedFiles,
             inputBytes,
             outputBytes,
-            outputFiles);
+            outputFiles)
+        {
+            OverwrittenFiles = overwrittenFiles
+        };
     }
 
     /// <summary>
@@ -543,13 +587,21 @@ public sealed class ImageResizrService : IImageResizrService
         int processedCount,
         int totalCount,
         string sourceFile,
+        int? originalWidth,
+        int? originalHeight,
         string reason)
     {
         progress?.Report(new ResizeProgressUpdate(
             processedCount,
             totalCount,
-            $"Failed to resize '{Path.GetFileName(sourceFile)}': {reason}",
-            ResizeProgressLevel.Error));
+            new ResizeEntry(
+                Path.GetFileName(sourceFile),
+                originalWidth,
+                originalHeight,
+                NewWidth: null,
+                NewHeight: null,
+                ResizeStatus.Failed,
+                ErrorMessage: reason)));
     }
 
     /// <summary>

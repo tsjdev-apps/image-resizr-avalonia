@@ -5,10 +5,8 @@ namespace ImageResizr.Core.Models;
 /// </summary>
 /// <param name="ProcessedCount">The number of source files processed so far.</param>
 /// <param name="TotalCount">The total number of source files to process.</param>
-/// <param name="Message">The progress message to show to the user.</param>
-/// <param name="Level">The severity level of the progress update.</param>
+/// <param name="Entry">The completed image result, or <see langword="null" /> for batch-level updates.</param>
 public sealed record ResizeProgressUpdate(
     int ProcessedCount,
     int TotalCount,
-    string Message,
-    ResizeProgressLevel Level = ResizeProgressLevel.Info);
+    ResizeEntry? Entry = null);

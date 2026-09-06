@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Window_Title" xml:space="preserve"><value>Image Resizr von tsjdev apps</value></data>
+  <data name="Main_Title" xml:space="preserve"><value>Image Resizr</value></data>
+  <data name="Main_Description" xml:space="preserve"><value>Bilder schnell skalieren und dabei das Seitenverhältnis beibehalten.</value></data>
+  <data name="SourceFolder_Label" xml:space="preserve"><value>Quellordner</value></data>
+  <data name="SourceFolder_Watermark" xml:space="preserve"><value>Wähle den Ordner mit den zu skalierenden Bildern aus</value></data>
+  <data name="SourceFolder_PickerTitle" xml:space="preserve"><value>Quellordner auswählen</value></data>
+  <data name="TargetFolder_Label" xml:space="preserve"><value>Zielordner</value></data>
+  <data name="TargetFolder_Watermark" xml:space="preserve"><value>Wähle aus, wo die skalierten Bilder gespeichert werden sollen</value></data>
+  <data name="TargetFolder_PickerTitle" xml:space="preserve"><value>Zielordner auswählen</value></data>
+  <data name="Browse_ToolTip" xml:space="preserve"><value>Durchsuchen…</value></data>
+  <data name="ResizeOptions_Title" xml:space="preserve"><value>Skalierungsoptionen</value></data>
+  <data name="SizePreset_Label" xml:space="preserve"><value>Größenvorgabe</value></data>
+  <data name="Width_Label" xml:space="preserve"><value>Breite</value></data>
+  <data name="Height_Label" xml:space="preserve"><value>Höhe</value></data>
+  <data name="Unit_Label" xml:space="preserve"><value>Einheit</value></data>
+  <data name="Pixels_Label" xml:space="preserve"><value>Pixel</value></data>
+  <data name="ResizeMode_Label" xml:space="preserve"><value>Skalierungsmodus</value></data>
+  <data name="ShrinkOnly_Label" xml:space="preserve"><value>Bilder verkleinern, aber nicht vergrößern</value></data>
+  <data name="IgnoreOrientation_Label" xml:space="preserve"><value>Bildausrichtung ignorieren</value></data>
+  <data name="OverwriteFiles_Label" xml:space="preserve"><value>Vorhandene Dateien überschreiben</value></data>
+  <data name="ResizeImages_Button" xml:space="preserve"><value>Bilder skalieren</value></data>
+  <data name="ResizingImages_Button" xml:space="preserve"><value>Bilder werden skaliert…</value></data>
+  <data name="Progress_Title" xml:space="preserve"><value>Fortschritt</value></data>
+  <data name="Progress_OverallTitle" xml:space="preserve"><value>Gesamtfortschritt</value></data>
+  <data name="Progress_HistoryTitle" xml:space="preserve"><value>Verarbeitungsverlauf</value></data>
+  <data name="Progress_NoFiles" xml:space="preserve"><value>Es wurden noch keine Dateien verarbeitet.</value></data>
+  <data name="Progress_ProcessedFile" xml:space="preserve"><value>{0} / {1} Datei verarbeitet</value></data>
+  <data name="Progress_ProcessedFiles" xml:space="preserve"><value>{0} / {1} Dateien verarbeitet</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Wähle Ordner und eine Größe aus und starte anschließend die Verarbeitung.</value></data>
+  <data name="Status_Preparing" xml:space="preserve"><value>Die Skalierung wird vorbereitet.</value></data>
+  <data name="Status_Running" xml:space="preserve"><value>Die Bilder werden skaliert.</value></data>
+  <data name="Status_Completed" xml:space="preserve"><value>Die Skalierung ist abgeschlossen.</value></data>
+  <data name="Status_NoSupportedFiles" xml:space="preserve"><value>Der Quellordner enthält keine unterstützten Bilddateien.</value></data>
+  <data name="Status_ReviewSettings" xml:space="preserve"><value>Überprüfe die Ordner und Skalierungseinstellungen und versuche es erneut.</value></data>
+  <data name="Status_InputFolderMissing" xml:space="preserve"><value>Der Quellordner wurde nicht gefunden.</value></data>
+  <data name="Status_FileSystemError" xml:space="preserve"><value>Ein Dateisystemfehler hat die Skalierung unterbrochen.</value></data>
+  <data name="Status_AccessDenied" xml:space="preserve"><value>Die App darf nicht auf einen der ausgewählten Ordner zugreifen.</value></data>
+  <data name="Validation_InputFolderRequired" xml:space="preserve"><value>Der Quellordner ist erforderlich.</value></data>
+  <data name="Validation_OutputFolderRequired" xml:space="preserve"><value>Der Zielordner ist erforderlich.</value></data>
+  <data name="Validation_DimensionsPositive" xml:space="preserve"><value>Breite und Höhe müssen größer als null sein.</value></data>
+  <data name="History_Status_Resized" xml:space="preserve"><value>Skaliert</value></data>
+  <data name="History_Status_Overwritten" xml:space="preserve"><value>Überschrieben</value></data>
+  <data name="History_Status_Skipped" xml:space="preserve"><value>Übersprungen</value></data>
+  <data name="History_Status_Failed" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+  <data name="History_TargetExists" xml:space="preserve"><value>Die Zieldatei ist bereits vorhanden</value></data>
+  <data name="History_AlreadyCorrectSize" xml:space="preserve"><value>Das Bild entspricht bereits der gewünschten Größe</value></data>
+  <data name="History_ResizeFailed" xml:space="preserve"><value>Das Bild konnte nicht skaliert werden</value></data>
+  <data name="History_SummaryTitle" xml:space="preserve"><value>Zusammenfassung</value></data>
+  <data name="History_Status_Completed" xml:space="preserve"><value>Abgeschlossen</value></data>
+  <data name="History_SummaryDetails" xml:space="preserve"><value>{0} skaliert · {1} überschrieben · {2} übersprungen · {3} fehlgeschlagen</value></data>
+  <data name="Completion_One" xml:space="preserve"><value>{0} Bild verarbeitet. {1} eingespart.</value></data>
+  <data name="Completion_Many" xml:space="preserve"><value>{0} Bilder verarbeitet. {1} eingespart.</value></data>
+  <data name="Preset_Small" xml:space="preserve"><value>Klein</value></data>
+  <data name="Preset_Medium" xml:space="preserve"><value>Mittel</value></data>
+  <data name="Preset_Large" xml:space="preserve"><value>Groß</value></data>
+  <data name="Preset_Phone" xml:space="preserve"><value>Smartphone</value></data>
+  <data name="Preset_Custom" xml:space="preserve"><value>Benutzerdefiniert</value></data>
+  <data name="Preset_Description" xml:space="preserve"><value>Passt in {0} × {1} Pixel</value></data>
+  <data name="Preset_CustomDescription" xml:space="preserve"><value>Eigene Pixelmaße verwenden</value></data>
+  <data name="ResizeMode_Fit" xml:space="preserve"><value>Einpassen — Seitenverhältnis beibehalten</value></data>
+  <data name="ResizeMode_Fill" xml:space="preserve"><value>Ausfüllen — auf Zielgröße zuschneiden</value></data>
+  <data name="ResizeMode_Stretch" xml:space="preserve"><value>Strecken — genaue Maße verwenden</value></data>
+</root>

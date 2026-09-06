@@ -2,213 +2,283 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:localization="using:ImageResizr.App.Localization"
         xmlns:viewModels="using:ImageResizr.App.ViewModels"
-        xmlns:models="using:ImageResizr.Core.Models"
-        xmlns:converters="using:ImageResizr.App.Converters"
         mc:Ignorable="d"
-        d:DesignWidth="960"
-        d:DesignHeight="620"
+        d:DesignWidth="1120"
+        d:DesignHeight="820"
         x:Class="ImageResizr.App.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
-        Width="960"
-        Height="700"
-        MinWidth="960"
-        MinHeight="700"
-        Background="#F5F7FA"
-        CanResize="False"
+        Width="1120"
+        Height="800"
+        MinWidth="1120"
+        MinHeight="800"
+        Background="{DynamicResource AppPageBackgroundBrush}"
+        CanResize="True"
         Icon="/Assets/AppIcon.ico"
-        Title="ImageResizr by tsjdev-apps">
+        Title="{x:Static localization:Strings.Window_Title}">
 
-    <Window.Resources>
-        <converters:ProgressLevelToBrushConverter x:Key="ProgressLevelToBrushConverter" />
-    </Window.Resources>
-
-    <Grid ColumnDefinitions="1.4*,0.9*"
+    <Grid ColumnDefinitions="1.25*,0.95*"
           ColumnSpacing="24"
-          Margin="12">
+          Margin="14">
         <Border Classes="card">
-            <StackPanel Spacing="18">
-                <StackPanel Spacing="4">
-                    <TextBlock Classes="heading-large" Text="Batch setup" />
-                    <TextBlock Classes="body-text"
-                               Text="Choose folders, select a size, and decide how the batch should handle image details."
-                               TextWrapping="Wrap" />
-                </StackPanel>
+            <Grid RowDefinitions="*,Auto" RowSpacing="18">
+                <ScrollViewer Grid.Row="0"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="16" Margin="0,0,6,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="heading-large"
+                                       Text="{x:Static localization:Strings.Main_Title}" />
+                            <TextBlock Classes="body-text"
+                                       Text="{x:Static localization:Strings.Main_Description}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
 
-                <StackPanel Spacing="8">
-                    <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Input folder" />
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                        <TextBox Grid.Column="0"
-                                 IsReadOnly="True"
-                                 Text="{Binding InputFolder}"
-                                 PlaceholderText="Select the folder that contains your source images" />
-                        <Button Grid.Column="1"
-                                Command="{Binding PickInputFolderCommand}"
-                                IsEnabled="{Binding CanEditInputs}"
-                                MinWidth="50"
-                                ToolTip.Tip="Browse..."
-                                Classes="Primary"
-                                Theme="{StaticResource SolidButton}">
-                            <PathIcon Width="18" Height="18" Data="M3 6H9L11 8H21V19H3Z" />
-                        </Button>
-                    </Grid>
-                </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section-title"
+                                       Text="{x:Static localization:Strings.SourceFolder_Label}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         MinHeight="42"
+                                         IsReadOnly="True"
+                                         Text="{Binding InputFolder}"
+                                         PlaceholderText="{x:Static localization:Strings.SourceFolder_Watermark}" />
+                                <Button Grid.Column="1"
+                                        Width="50"
+                                        Command="{Binding PickInputFolderCommand}"
+                                        IsEnabled="{Binding CanEditInputs}"
+                                        ToolTip.Tip="{x:Static localization:Strings.Browse_ToolTip}"
+                                        Classes="Primary"
+                                        Theme="{StaticResource SolidButton}">
+                                    <PathIcon Width="18" Height="18" Data="M3 6H9L11 8H21V19H3Z" />
+                                </Button>
+                            </Grid>
+                        </StackPanel>
 
-                <StackPanel Spacing="8">
-                    <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Output folder" />
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                        <TextBox Grid.Column="0"
-                                 IsReadOnly="True"
-                                 Text="{Binding OutputFolder}"
-                                 PlaceholderText="Select where resized images should be written" />
-                        <Button Grid.Column="1"
-                                Command="{Binding PickOutputFolderCommand}"
-                                IsEnabled="{Binding CanEditInputs}"
-                                MinWidth="50"
-                                ToolTip.Tip="Browse..."
-                                Classes="Primary"
-                                Theme="{StaticResource SolidButton}">
-                            <PathIcon Width="18" Height="18" Data="M3 6H9L11 8H21V19H3Z" />
-                        </Button>
-                    </Grid>
-                </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section-title"
+                                       Text="{x:Static localization:Strings.TargetFolder_Label}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         MinHeight="42"
+                                         IsReadOnly="True"
+                                         Text="{Binding OutputFolder}"
+                                         PlaceholderText="{x:Static localization:Strings.TargetFolder_Watermark}" />
+                                <Button Grid.Column="1"
+                                        Width="50"
+                                        Command="{Binding PickOutputFolderCommand}"
+                                        IsEnabled="{Binding CanEditInputs}"
+                                        ToolTip.Tip="{x:Static localization:Strings.Browse_ToolTip}"
+                                        Classes="Primary"
+                                        Theme="{StaticResource SolidButton}">
+                                    <PathIcon Width="18" Height="18" Data="M3 6H9L11 8H21V19H3Z" />
+                                </Button>
+                            </Grid>
+                        </StackPanel>
 
-                <StackPanel Spacing="8">
-                    <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Size preset" />
-                    <ComboBox ItemsSource="{Binding Presets}"
-                              SelectedItem="{Binding SelectedPreset}"
-                              IsEnabled="{Binding CanEditInputs}"
-                              MinHeight="48"
-                              HorizontalAlignment="Stretch">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="models:ResizePresetOption">
-                                <Border Padding="0,4">
-                                    <StackPanel Spacing="2">
-                                        <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}" />
-                                        <TextBlock FontSize="12" Foreground="#475569" Text="{Binding Description}" />
-                                    </StackPanel>
+                        <TextBlock Classes="heading-medium"
+                                   FontSize="18"
+                                   Margin="0,2,0,-4"
+                                   Text="{x:Static localization:Strings.ResizeOptions_Title}" />
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section-title"
+                                       Text="{x:Static localization:Strings.SizePreset_Label}" />
+                            <ComboBox ItemsSource="{Binding Presets}"
+                                      SelectedItem="{Binding SelectedPreset}"
+                                      IsEnabled="{Binding CanEditInputs}"
+                                      MinHeight="48"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:ResizePresetItemViewModel">
+                                        <Border Padding="0,4">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}" />
+                                                <TextBlock Classes="muted-text"
+                                                           FontSize="12"
+                                                           Text="{Binding Description}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*,*,96" ColumnSpacing="12">
+                            <StackPanel Spacing="8">
+                                <TextBlock Classes="section-title"
+                                           Text="{x:Static localization:Strings.Width_Label}" />
+                                <NumericUpDown ClipValueToMinMax="True"
+                                               ParsingNumberStyle="Integer"
+                                               FormatString="N0"
+                                               Value="{Binding TargetWidth}"
+                                               Increment="10"
+                                               Minimum="1"
+                                               Maximum="10000"
+                                               IsEnabled="{Binding CanEditCustomDimensions}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="8">
+                                <TextBlock Classes="section-title"
+                                           Text="{x:Static localization:Strings.Height_Label}" />
+                                <NumericUpDown ClipValueToMinMax="True"
+                                               ParsingNumberStyle="Integer"
+                                               FormatString="N0"
+                                               Value="{Binding TargetHeight}"
+                                               Increment="10"
+                                               Minimum="1"
+                                               Maximum="10000"
+                                               IsEnabled="{Binding CanEditCustomDimensions}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="8">
+                                <TextBlock Classes="section-title"
+                                           Text="{x:Static localization:Strings.Unit_Label}" />
+                                <Border Classes="panel" Padding="10,8">
+                                    <TextBlock HorizontalAlignment="Center"
+                                               Classes="body-text"
+                                               Text="{x:Static localization:Strings.Pixels_Label}" />
                                 </Border>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </StackPanel>
+                            </StackPanel>
+                        </Grid>
 
-                <Grid ColumnDefinitions="*,*,110" ColumnSpacing="12">
-                    <StackPanel Spacing="8">
-                        <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Width" />
-                        <NumericUpDown ClipValueToMinMax="True"
-                                       ParsingNumberStyle="Integer"
-                                       FormatString="N0"
-                                       Value="{Binding TargetWidth}"
-                                       Increment="10"
-                                       Minimum="1"
-                                       Maximum="10000"
-                                       IsEnabled="{Binding CanEditCustomDimensions}" />
-                    </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section-title"
+                                       Text="{x:Static localization:Strings.ResizeMode_Label}" />
+                            <ComboBox ItemsSource="{Binding ResizeModes}"
+                                      SelectedItem="{Binding SelectedResizeMode}"
+                                      IsEnabled="{Binding CanEditInputs}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:ResizeModeItemViewModel">
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
 
-                    <StackPanel Grid.Column="1" Spacing="8">
-                        <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Height" />
-                        <NumericUpDown ClipValueToMinMax="True"
-                                       ParsingNumberStyle="Integer"
-                                       FormatString="N0"
-                                       Value="{Binding TargetHeight}"
-                                       Increment="10"
-                                       Minimum="1"
-                                       Maximum="10000"
-                                       IsEnabled="{Binding CanEditCustomDimensions}" />
-                    </StackPanel>
+                        <Border Classes="panel">
+                            <StackPanel Spacing="10">
+                                <CheckBox Content="{x:Static localization:Strings.ShrinkOnly_Label}"
+                                          IsEnabled="{Binding CanEditInputs}"
+                                          IsChecked="{Binding ShrinkOnly}" />
+                                <CheckBox Content="{x:Static localization:Strings.IgnoreOrientation_Label}"
+                                          IsEnabled="{Binding CanEditInputs}"
+                                          IsChecked="{Binding IgnoreOrientation}" />
+                                <CheckBox Content="{x:Static localization:Strings.OverwriteFiles_Label}"
+                                          IsEnabled="{Binding CanEditInputs}"
+                                          IsChecked="{Binding OverwriteExisting}" />
+                            </StackPanel>
+                        </Border>
 
-                    <StackPanel Grid.Column="2" Spacing="8">
-                        <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Unit" />
-                        <Border Classes="panel" Padding="12,8">
-                            <TextBlock HorizontalAlignment="Center" Foreground="#475569" Text="Pixels" />
+                        <Border Classes="validation" IsVisible="{Binding HasValidationMessage}">
+                            <TextBlock Foreground="{DynamicResource AppValidationTextBrush}"
+                                       Text="{Binding ValidationMessage}"
+                                       TextWrapping="Wrap" />
                         </Border>
                     </StackPanel>
-                </Grid>
+                </ScrollViewer>
 
-                <StackPanel Spacing="8">
-                    <TextBlock FontWeight="SemiBold" Foreground="#1E293B" Text="Resize mode" />
-                    <ComboBox ItemsSource="{Binding ResizeModes}"
-                              SelectedItem="{Binding SelectedResizeMode}"
-                              IsEnabled="{Binding CanEditInputs}"
-                              HorizontalAlignment="Stretch" />
-                </StackPanel>
-
-                <Border Classes="panel">
-                    <StackPanel Spacing="10">
-                        <CheckBox Content="Make pictures smaller but not larger"
-                                  IsEnabled="{Binding CanEditInputs}"
-                                  IsChecked="{Binding ShrinkOnly}" />
-                        <CheckBox Content="Ignore the orientation of pictures"
-                                  IsEnabled="{Binding CanEditInputs}"
-                                  IsChecked="{Binding IgnoreOrientation}" />
-                        <CheckBox Content="Overwrite files"
-                                  IsEnabled="{Binding CanEditInputs}"
-                                  IsChecked="{Binding OverwriteExisting}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Classes="validation" IsVisible="{Binding HasValidationMessage}">
-                    <TextBlock Foreground="#B91C1C" Text="{Binding ValidationMessage}" TextWrapping="Wrap" />
-                </Border>
-
-                <Button Classes="Primary"
+                <Button Grid.Row="1"
+                        Classes="Primary"
                         Theme="{StaticResource SolidButton}"
                         Command="{Binding StartCommand}"
                         Content="{Binding StartButtonText}"
                         HorizontalAlignment="Stretch" />
-            </StackPanel>
+            </Grid>
         </Border>
 
-        <Grid Grid.Column="1"
-              RowDefinitions="Auto,*,Auto"
-              RowSpacing="24">
-            <Border Grid.Row="0" Classes="card">
-                <StackPanel Spacing="18">
-                    <StackPanel Spacing="4">
-                        <TextBlock Classes="heading-medium" Text="Live progress" />
-                        <TextBlock Classes="body-text" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+        <Border Grid.Column="1" Classes="card">
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18">
+                <StackPanel Grid.Row="0" Spacing="4">
+                    <TextBlock Classes="heading-medium"
+                               Text="{x:Static localization:Strings.Progress_Title}" />
+                    <TextBlock Classes="body-text"
+                               Text="{Binding StatusMessage}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Grid.Row="1" Classes="progress-panel">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="section-title"
+                                   Text="{x:Static localization:Strings.Progress_OverallTitle}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <TextBlock Classes="accent"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding ProgressSummary}" />
+                            <TextBlock Grid.Column="1"
+                                       Classes="accent"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding ProgressPercentageText}" />
+                        </Grid>
+                        <ProgressBar Height="12"
+                                     Foreground="{DynamicResource AppAccentBrush}"
+                                     Maximum="{Binding ProgressBarMaximum}"
+                                     Value="{Binding ProgressValue}" />
                     </StackPanel>
+                </Border>
 
-                    <Border Classes="info">
-                        <StackPanel Spacing="12">
-                            <TextBlock FontWeight="SemiBold" Classes="accent" Text="{Binding ProgressSummary}" />
-                            <ProgressBar Height="12"
-                                         Foreground="#FF914D"
-                                         Maximum="{Binding ProgressMaximum}"
-                                         Value="{Binding ProgressValue}" />
-                            <TextBlock Foreground="#FF914D" Text="{Binding ProgressPercentageText}" />
-                        </StackPanel>
-                    </Border>
+                <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="8" MinHeight="0">
+                    <TextBlock Grid.Row="0"
+                               Classes="section-title"
+                               Text="{x:Static localization:Strings.Progress_HistoryTitle}" />
 
-                    <Border Classes="panel">
-                        <StackPanel Spacing="8">
-                            <TextBlock FontWeight="SemiBold" Foreground="#0F172A" Text="Latest activity" />
-                            <TextBlock Text="{Binding LatestActivityMessage}"
-                                       MinHeight="44"
-                                       MaxHeight="44"
-                                       MaxLines="2"
-                                       TextWrapping="Wrap"
-                                       TextTrimming="CharacterEllipsis"
-                                       Foreground="{Binding LatestActivityLevel, Converter={StaticResource ProgressLevelToBrushConverter}}" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Border>
+                    <Grid Grid.Row="1" MinHeight="0">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="20"
+                                   Classes="muted-text"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !HasHistory}"
+                                   Text="{x:Static localization:Strings.Progress_NoFiles}" />
 
-            <Border Grid.Row="2" Classes="card">
-                <StackPanel Spacing="12">
-                    <TextBlock Classes="heading-medium" Text="Supported formats" />
-                    <WrapPanel>
-                        <Border Classes="tag"><TextBlock Text=".jpg" /></Border>
-                        <Border Classes="tag"><TextBlock Text=".jpeg" /></Border>
-                        <Border Classes="tag"><TextBlock Text=".png" /></Border>
-                        <Border Classes="tag"><TextBlock Text=".gif" /></Border>
-                        <Border Classes="tag"><TextBlock Text=".bmp" /></Border>
-                        <Border Classes="tag"><TextBlock Text=".webp" /></Border>
-                    </WrapPanel>
-                </StackPanel>
-            </Border>
-        </Grid>
+                        <ListBox x:Name="HistoryList"
+                                 Classes="history-list"
+                                 ItemsSource="{Binding ResizeHistory}"
+                                 IsVisible="{Binding HasHistory}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ResizeHistoryItemViewModel">
+                                    <Border Classes="history-row">
+                                        <Grid ColumnDefinitions="22,*,Auto"
+                                              RowDefinitions="Auto,Auto"
+                                              ColumnSpacing="6">
+                                            <TextBlock Grid.RowSpan="2"
+                                                       Classes="accent"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Text="{Binding StatusSymbol}" />
+                                            <TextBlock Grid.Column="1"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource AppTextPrimaryBrush}"
+                                                       Text="{Binding FileName}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="2"
+                                                       Classes="muted-text"
+                                                       FontSize="12"
+                                                       Text="{Binding StatusText}" />
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="1"
+                                                       Grid.ColumnSpan="2"
+                                                       Margin="0,2,0,0"
+                                                       Classes="body-text"
+                                                       FontSize="12"
+                                                       Text="{Binding DetailText}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
